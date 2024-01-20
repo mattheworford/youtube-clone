@@ -1,17 +1,14 @@
 # Use an official Node runtime as a parent image
-FROM node:18
+FROM node:18-alpine
 
 # Set the working directory in the container to /app
 WORKDIR /app
 
-# Install ffmpeg in the container
-RUN apt-get update && apt-get install -y ffmpeg
-
 # Copy package.json and package-lock.json into the working directory
 COPY package*.json ./
 
-# Install any needed packages specified in package.json
-RUN npm install
+# Install ffmpeg and npm packages in the container
+RUN apk update && apk add ffmpeg && rm -rf /var/cache/apk/* && npm ci
 
 # Copy app source inside the docker image
 COPY . .
