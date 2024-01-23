@@ -30,4 +30,4 @@ npm run format
 
 ### Pre-Commit Hooks
 
-Husky is set up to run ESLint and Prettier before each commit. Make sure your commits meet code quality standards.
+Husky is set up to run ESLint and Prettier before each commit.
