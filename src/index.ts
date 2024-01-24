@@ -11,11 +11,12 @@ const app = express();
 app.use(express.json());
 app.post(
   '/process-video',
-  body('inputFilePath', 'outputFilePath').notEmpty(),
+  body(['inputFilePath', 'outputFilePath']).notEmpty(),
   (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
       const data = matchedData(req);
+      console.log(data);
       scaleVideo(data.inputFilePath, data.outputFilePath)
         .then((successMessage: string) => {
           console.log(successMessage);
@@ -25,9 +26,9 @@ app.post(
           console.error(errorMessage);
           res.status(500).send(errorMessage);
         });
+    } else {
+      res.status(400).send({ errors: result.array() });
     }
-
-    res.status(400).send({ errors: result.array() });
   }
 );
 app.listen(port, () => {
