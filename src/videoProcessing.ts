@@ -12,16 +12,18 @@ export function scaleVideo(
       reject(`File not found at ${inputFilePath}.`);
     }
 
+    console.log(outputFilePath);
+
     ffmpeg(inputFilePath)
-      .outputOptions('-vf', `scale=-1:${height.toString}`)
+      .outputOptions('-vf', `scale=-1:${height.toString()}`)
+      .save(outputFilePath)
       .on('end', function () {
         resolve(
-          `Successfully scaled ${inputFilePath} to a height of ${height.toString} pixels.`
+          `Successfully scaled ${inputFilePath} to a height of ${height.toString()} pixels.`
         );
       })
-      .on('error', function (err: Error) {
+      .on('error', function (err: any) {
         reject(`An error occurred: ${err.message}.`);
-      })
-      .save(outputFilePath);
+      });
   });
 }
