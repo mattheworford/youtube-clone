@@ -1,7 +1,7 @@
 import { scaleVideo } from '../src/videoProcessing';
 import fs from 'fs';
 import { jest, describe, expect, it } from '@jest/globals';
-import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg';
+import ffmpeg from 'fluent-ffmpeg';
 
 jest.mock('fluent-ffmpeg', () => {
   return jest.fn(function (this: jest.Mocked<ffmpeg.FfmpegCommand>) {
@@ -9,14 +9,14 @@ jest.mock('fluent-ffmpeg', () => {
       outputOptions: jest.fn().mockReturnThis(),
       save: jest.fn().mockReturnThis(),
       on: jest
-        .fn()
+        .fn((event: unknown, callback: unknown) => this)
         .mockImplementationOnce(function (
           this: jest.Mocked<ffmpeg.FfmpegCommand>,
           event: unknown,
           callback: unknown
         ) {
-          if (event === 'error') {
-            (callback as (err: Error) => void)(new Error('Mocked error'));
+          if (event === 'end') {
+            (callback as () => void)();
           }
           return this;
         })
@@ -30,6 +30,18 @@ jest.mock('fluent-ffmpeg', () => {
           }
           return this;
         })
+        .mockImplementationOnce(function (
+          this: jest.Mocked<ffmpeg.FfmpegCommand>,
+          event: unknown,
+          callback: unknown
+        ) {
+          if (event === 'error') {
+            (callback as (err: Error) => void)(
+              new Error('An error occurred: error message')
+            );
+          }
+          return this;
+        })
     };
   });
 });
@@ -39,11 +51,11 @@ jest.mock('fs', () => ({
 }));
 
 describe('scaleVideo', () => {
-  it('rejects with an error message if the video is not processed successfully', async () => {
-    (fs.existsSync as jest.Mock).mockReturnValue(true);
+  it('rejects if the input file does not exist', async () => {
+    (fs.existsSync as jest.Mock).mockReturnValue(false);
 
     await expect(scaleVideo('input.mp4', 'output.mp4')).rejects.toEqual(
-      'Successfully scaled input.mp4 to a height of 360 pixels.'
+      'File not found at input.mp4.'
     );
   });
 
@@ -55,11 +67,11 @@ describe('scaleVideo', () => {
     );
   });
 
-  it('rejects if the input file does not exist', async () => {
-    (fs.existsSync as jest.Mock).mockReturnValue(false);
+  it('resolves with a error message if the video is processed successfully', async () => {
+    (fs.existsSync as jest.Mock).mockReturnValue(true);
 
     await expect(scaleVideo('input.mp4', 'output.mp4')).rejects.toEqual(
-      'File not found at input.mp4.'
+      'Successfully scaled input.mp4 to a height of 360 pixels.'
     );
   });
 });
