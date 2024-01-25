@@ -1,4 +1,4 @@
-import ffmpeg from 'fluent-ffmpeg';
+import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg';
 import fs from 'fs';
 import { Error } from './model/error';
 
@@ -10,19 +10,20 @@ export function scaleVideo(
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(inputFilePath)) {
       reject(`File not found at ${inputFilePath}.`);
+      return;
     }
 
-    console.log(outputFilePath);
+    const ffmpegCommand: FfmpegCommand = ffmpeg(inputFilePath)
+      .outputOptions('-vf', `scale=-1:${height}`)
+      .save(outputFilePath);
 
-    ffmpeg(inputFilePath)
-      .outputOptions('-vf', `scale=-1:${height.toString()}`)
-      .save(outputFilePath)
-      .on('end', function () {
+    ffmpegCommand
+      .on('end', () => {
         resolve(
-          `Successfully scaled ${inputFilePath} to a height of ${height.toString()} pixels.`
+          `Successfully scaled ${inputFilePath} to a height of ${height} pixels.`
         );
       })
-      .on('error', function (err: any) {
+      .on('error', (err: Error) => {
         reject(`An error occurred: ${err.message}.`);
       });
   });
