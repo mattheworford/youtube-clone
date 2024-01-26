@@ -32,21 +32,13 @@ Install the required dependencies:
 npm install
 ```
 
-## Building Docker Image
+## Docker
 
 ### Prerequisites
 
 - [Docker](https://www.docker.com/) installed on your machine.
 
-### Installation
-
-To install, follow the steps below:
-
-Clone the repository to your local machine:
-
-```bash
-git clone https://github.com/mattheworford/youtube-clone.git
-```
+### Image Building
 
 From the project's root directory, build the image:
 
