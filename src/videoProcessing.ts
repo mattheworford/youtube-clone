@@ -24,7 +24,7 @@ export function scaleVideo(
         );
       })
       .on('error', (err: Error) => {
-        reject(`An error occurred: ${err.message}.`);
+        reject(`An error occurred: ${err.message}`);
       });
   });
 }
