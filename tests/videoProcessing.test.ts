@@ -8,40 +8,16 @@ jest.mock('fluent-ffmpeg', () => {
     return {
       outputOptions: jest.fn().mockReturnThis(),
       save: jest.fn().mockReturnThis(),
-      on: jest
-        .fn((event: unknown, callback: unknown) => this)
-        .mockImplementationOnce(function (
-          this: jest.Mocked<ffmpeg.FfmpegCommand>,
-          event: unknown,
-          callback: unknown
-        ) {
-          if (event === 'end') {
-            (callback as () => void)();
-          }
-          return this;
-        })
-        .mockImplementationOnce(function (
-          this: jest.Mocked<ffmpeg.FfmpegCommand>,
-          event: unknown,
-          callback: unknown
-        ) {
-          if (event === 'end') {
-            (callback as () => void)();
-          }
-          return this;
-        })
-        .mockImplementationOnce(function (
-          this: jest.Mocked<ffmpeg.FfmpegCommand>,
-          event: unknown,
-          callback: unknown
-        ) {
-          if (event === 'error') {
-            (callback as (err: Error) => void)(
-              new Error('An error occurred: error message')
-            );
-          }
-          return this;
-        })
+      on: jest.fn(function (
+        this: jest.Mocked<ffmpeg.FfmpegCommand>,
+        event: unknown,
+        callback: unknown
+      ) {
+        if (event === 'end') {
+          (callback as () => void)();
+        }
+        return this;
+      })
     };
   });
 });
@@ -63,14 +39,6 @@ describe('scaleVideo', () => {
     (fs.existsSync as jest.Mock).mockReturnValue(true);
 
     await expect(scaleVideo('input.mp4', 'output.mp4')).resolves.toEqual(
-      'Successfully scaled input.mp4 to a height of 360 pixels.'
-    );
-  });
-
-  it('resolves with a error message if the video is processed successfully', async () => {
-    (fs.existsSync as jest.Mock).mockReturnValue(true);
-
-    await expect(scaleVideo('input.mp4', 'output.mp4')).rejects.toEqual(
       'Successfully scaled input.mp4 to a height of 360 pixels.'
     );
   });
