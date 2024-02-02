@@ -1,11 +1,11 @@
 # Stage 1: Build stage
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm install --quiet
 
 COPY . .
 
@@ -14,12 +14,16 @@ RUN npm run build
 # Stage 2: Production stage
 FROM node:18-alpine
 
-RUN apk update && apk add ffmpeg
-
 WORKDIR /app
 
-COPY package*.json ./
+RUN apk update && apk add --no-cache ffmpeg
 
-RUN npm ci --only=production
+COPY --from=builder /app/package*.json ./
+
+RUN npm install --quiet --only=production
 
 COPY --from=builder /app/dist ./dist
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "serve" ]
