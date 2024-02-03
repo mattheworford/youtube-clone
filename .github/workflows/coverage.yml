@@ -19,6 +19,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Go to VPS Directory
+        run: cd video-processing-service
+
       - name: Install dependencies
         run: npm install
 
