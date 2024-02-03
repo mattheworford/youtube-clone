@@ -12,7 +12,8 @@ import {
   downloadFromGcs,
   initLocalDirectory,
   deleteLocalFile,
-  uploadToGcs
+  uploadToGcs,
+  deleteLocalFiles
 } from './storage';
 
 dotenv.config();
@@ -26,13 +27,17 @@ app.use(express.json());
 
 app.post(
   '/process-video',
-  body('message.data.name').notEmpty(),
+  body('message.data').notEmpty(),
   async (req, res) => {
     const result = validationResult(req);
     if (result.isEmpty()) {
-      const data = matchedData(req);
+      const body = matchedData(req);
+      const dataJson = Buffer.from(body.message.data, 'base64').toString(
+        'utf8'
+      );
+      const data = JSON.parse(dataJson);
 
-      const inputFileName = data.message.data.name;
+      const inputFileName = data.name;
       const outputFileName = `processed-${inputFileName}`;
 
       await downloadFromGcs(
@@ -41,7 +46,10 @@ app.post(
         localRawVideoDirectory
       );
 
-      scaleVideo(inputFileName, outputFileName)
+      const localInputFilePath = `${localRawVideoDirectory}/${inputFileName}`;
+      const localOutputFilePath = `${localProcessedVideoDirectory}/${outputFileName}`;
+
+      scaleVideo(localInputFilePath, localOutputFilePath)
         .then(async (successMessage: string) => {
           await uploadToGcs(
             outputFileName,
@@ -49,18 +57,12 @@ app.post(
             processedVideoBucketName
           );
 
-          await Promise.all([
-            deleteLocalFile(`${localRawVideoDirectory}/${inputFileName}`),
-            deleteLocalFile(`${localProcessedVideoDirectory}/${outputFileName}`)
-          ]);
-
+          deleteLocalVideoFiles;
           res.status(200).send(successMessage);
         })
         .catch(async (errorMessage: string) => {
-          await Promise.all([
-            deleteLocalFile(`${localRawVideoDirectory}/${inputFileName}`),
-            deleteLocalFile(`${localProcessedVideoDirectory}/${outputFileName}`)
-          ]);
+          console.error(`Error: ${errorMessage}`);
+          deleteLocalVideoFiles;
           return res.status(500).send(errorMessage);
         });
     } else {
@@ -75,5 +77,10 @@ app.listen(port, () => {
 
 function initLocalDirectories() {
   initLocalDirectory(localRawVideoDirectory);
+  initLocalDirectory(localProcessedVideoDirectory);
+}
+
+function deleteLocalVideoFiles() {
+  deleteLocalFiles([localRawVideoDirectory, localProcessedVideoDirectory]);
   initLocalDirectory(localProcessedVideoDirectory);
 }
