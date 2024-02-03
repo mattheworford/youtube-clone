@@ -1,5 +1,6 @@
 import {
   deleteLocalFile,
+  deleteLocalFiles,
   downloadFromGcs,
   initLocalDirectory,
   uploadToGcs
@@ -43,7 +44,7 @@ describe('downloadFromGcs', () => {
     expect(
       new Storage().bucket(bucketName).file(fileName).download
     ).toHaveBeenCalledWith({
-      destination: destination
+      destination: `${destination}/${fileName}`
     });
 
     expect(console.log).toHaveBeenCalledWith(
@@ -140,5 +141,32 @@ describe('initLocalDirectory', () => {
 
     expect(fs.existsSync).toHaveBeenCalledWith(path);
     expect(fs.mkdirSync).toHaveBeenCalledWith(path, { recursive: true });
+  });
+});
+describe('deleteLocalFiles', () => {
+  beforeEach(() => {
+    (fs.existsSync as jest.Mock).mockClear();
+    (fs.unlink as unknown as jest.Mock).mockClear();
+  });
+
+  it('should delete multiple local files', async () => {
+    (fs.existsSync as jest.Mock).mockReturnValue(false);
+
+    const filePaths = ['file1.txt', 'file2.txt', 'file3.txt'];
+
+    await deleteLocalFiles(filePaths);
+
+    expect(fs.existsSync).toHaveBeenCalledTimes(filePaths.length);
+    filePaths.forEach((filePath) => {
+      expect(fs.existsSync).toHaveBeenCalledWith(filePath);
+    });
+  });
+
+  it('should handle empty file paths array', async () => {
+    const filePaths: string[] = [];
+
+    await deleteLocalFiles(filePaths);
+
+    expect(fs.existsSync).not.toHaveBeenCalled();
   });
 });
