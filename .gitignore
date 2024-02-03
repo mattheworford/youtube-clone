@@ -1,6 +1,6 @@
 
-node_modules/
-package-lock.json
+video-processing-service/node_modules/
+video-processing-service/package-lock.json
 *.mp4
 .DS_Store
-bin/build-and-deploy.sh
+video-processing-service/bin/build-and-deploy.sh

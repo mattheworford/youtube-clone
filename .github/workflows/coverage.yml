@@ -20,7 +20,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
-        run: npm install
+        run: cd video-processing-service && npm install
 
       - name: Run the tests
-        run: npm test -- --coverage
+        run: cd video-processing-service && npm test -- --coverage
