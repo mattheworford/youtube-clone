@@ -23,33 +23,13 @@ git clone https://github.com/mattheworford/youtube-clone.git
 Change directory to the project folder:
 
 ```bash
-cd youtube-clone
+cd youtube-clone/video-processing-service
 ```
 
 Install the required dependencies:
 
 ```bash
 npm install
-```
-
-## Docker
-
-### Prerequisites
-
-- [Docker](https://www.docker.com/) installed on your machine.
-
-### Image Building
-
-From the project's root directory, build the image:
-
-```bash
-docker build -t youtube-clone .
-```
-
-Run the image locally:
-
-```bash
-docker run -p 3000:3000 -d youtube-clone
 ```
 
 ## Code Quality
