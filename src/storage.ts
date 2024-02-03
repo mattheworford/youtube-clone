@@ -10,9 +10,12 @@ export async function downloadFromGcs(
 ) {
   const gcsPath = `gs://${bucketName}/${fileName}`;
 
-  await storage.bucket(bucketName).file(fileName).download({
-    destination: destination
-  });
+  await storage
+    .bucket(bucketName)
+    .file(fileName)
+    .download({
+      destination: `${destination}/${fileName}`
+    });
 
   console.log(`${fileName} downloaded from ${gcsPath} to ${destination}.`);
 }
@@ -23,13 +26,21 @@ export async function uploadToGcs(
   bucketName: string
 ) {
   const gcsPath = `gs://${bucketName}/${fileName}`;
+  const bucket = storage.bucket(bucketName);
 
-  await storage.bucket(bucketName).upload(`${localDirectory}/${fileName}`, {
+  await bucket.upload(`${localDirectory}/${fileName}`, {
     destination: fileName
   });
-  await storage.bucket(bucketName).file(fileName).makePublic();
-
   console.log(`${fileName} uploaded from ${localDirectory} to ${gcsPath}.`);
+
+  await bucket.file(fileName).makePublic();
+}
+
+export function initLocalDirectory(path: string) {
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path, { recursive: true });
+    console.log(`Directory created at ${path}`);
+  }
 }
 
 export function deleteLocalFile(filePath: string): Promise<void> {
@@ -48,8 +59,6 @@ export function deleteLocalFile(filePath: string): Promise<void> {
   });
 }
 
-export function initLocalDirectory(path: string) {
-  if (!fs.existsSync(path)) {
-    fs.mkdirSync(path, { recursive: true });
-  }
+export async function deleteLocalFiles(filePaths: string[]) {
+  await Promise.all(filePaths.map(deleteLocalFile));
 }
