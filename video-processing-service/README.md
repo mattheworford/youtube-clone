@@ -1,8 +1,8 @@
-# youtube-clone
+# Video Processing Service
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier) [![code analysis: eslint](https://img.shields.io/badge/code_analysis-eslint-154564.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-YouTube clone implemented in TypeScript
+Node.js backend service for processing videos uploaded to GCS
 
 ## Getting Started
 
@@ -14,13 +14,7 @@ YouTube clone implemented in TypeScript
 
 To install, follow the steps below:
 
-Clone the repository to your local machine:
-
-```bash
-git clone https://github.com/mattheworford/youtube-clone.git
-```
-
-Change directory to the project folder:
+Change directory to the VPS folder:
 
 ```bash
 cd youtube-clone/video-processing-service
