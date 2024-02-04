@@ -9,11 +9,11 @@ package-lock.json
 /coverage
 
 # next.js
-/.next/
-/out/
+/web-client/.next/
+/web-client/out/
 
 # production
-/build
+/web-client/build/
 
 # misc
 .DS_Store
@@ -37,5 +37,5 @@ next-env.d.ts
 # videos
 *.mp4
 
-# miscallaneous
+# miscellaneous
 video-processing-service/bin/build-and-deploy.sh
