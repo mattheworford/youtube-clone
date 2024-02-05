@@ -1,7 +1,7 @@
 export default function Watch() {
   return (
     <div>
-      <p>Watch Page</p>
+      <h1>Watch Page</h1>
     </div>
   );
 }
