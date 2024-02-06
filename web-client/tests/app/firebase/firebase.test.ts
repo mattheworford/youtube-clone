@@ -2,7 +2,7 @@ import {
   signInWithGoogle,
   signOut,
   onAuthStateChange
-} from '../src/app/firebase/firebase';
+} from '../../../src/app/firebase/firebase';
 import {
   getAuth,
   signInWithPopup,
