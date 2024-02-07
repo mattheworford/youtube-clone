@@ -15,6 +15,7 @@ import {
   uploadToGcs,
   deleteLocalFiles
 } from './storage';
+import { isVideoNew, setVideo } from './firestore';
 
 dotenv.config();
 
@@ -39,6 +40,19 @@ app.post(
 
       const inputFileName = data.name;
       const outputFileName = `processed-${inputFileName}`;
+      const videoId = inputFileName.split('.')[0];
+
+      if (!isVideoNew(videoId)) {
+        return res
+          .status(400)
+          .send('Bad Request: video already processing or processed.');
+      } else {
+        await setVideo(videoId, {
+          id: videoId,
+          uid: videoId.split('-')[0],
+          status: 'processing'
+        });
+      }
 
       await downloadFromGcs(
         inputFileName,
@@ -57,7 +71,13 @@ app.post(
             processedVideoBucketName
           );
 
+          await setVideo(videoId, {
+            status: 'processed',
+            filename: outputFileName
+          });
+
           deleteLocalVideoFiles;
+
           res.status(200).send(successMessage);
         })
         .catch(async (errorMessage: string) => {
